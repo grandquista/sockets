@@ -35,13 +35,18 @@ def main():
             server.listen()
             conn, addr = server.accept()
             with conn:
-                while True:
-                    size = BUFFER_SIZE
-                    while size == BUFFER_SIZE:
+                # while True:
+                    msg = b''
+                    while True:
                         buffer = conn.recv(BUFFER_SIZE)
-                        # print(buffer.decode('utf8'))
-                        conn.sendall(buffer)
-                        size = len(buffer)
+                        msg += buffer
+                        if len(buffer) < BUFFER_SIZE:
+                            break
+                    conn.sendall(msg)
+                    print(
+                        SERVER_ECHO.format(
+                            msg=msg.decode('utf8'),
+                            date=datetime.now()))
     finally:
         print(SERVER_END.format(port=ADDR[1], date=datetime.now()))
 
