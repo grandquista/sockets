@@ -22,6 +22,8 @@ ADDR = ('127.0.0.1', 8080)
 
 BUFFER_SIZE = 1024
 
+DATE_FORMAT = '%H:%M:%S %d/%m/%y'
+
 SERVER_START = '--- Starting server on port {port} at {date} ---'
 SERVER_ECHO = '[{date}] Echoed: {msg}'
 SERVER_END = '\n--- Stopping server on port {port} at {date} ---'
@@ -31,7 +33,10 @@ def main():
     try:
         with socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) as server:
             server.bind(ADDR)
-            print(SERVER_START.format(port=ADDR[1], date=datetime.now()))
+            print(
+                SERVER_START.format(
+                    port=ADDR[1],
+                    date=datetime.now().strftime(DATE_FORMAT)))
             server.listen()
             conn, addr = server.accept()
             with conn:
@@ -46,9 +51,12 @@ def main():
                     print(
                         SERVER_ECHO.format(
                             msg=msg.decode('utf8'),
-                            date=datetime.now()))
+                            date=datetime.now().strftime(DATE_FORMAT)))
     finally:
-        print(SERVER_END.format(port=ADDR[1], date=datetime.now()))
+        print(
+            SERVER_END.format(
+                port=ADDR[1],
+                date=datetime.now().strftime(DATE_FORMAT)))
 
 
 if __name__ == '__main__':
