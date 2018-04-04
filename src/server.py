@@ -20,38 +20,50 @@ from socket import socket, AF_INET, IPPROTO_TCP, SOCK_STREAM
 
 ADDR = ('127.0.0.1', 8080)
 
-BUFFER_SIZE = 1024
+BUFFER_SIZE = 8
 
 DATE_FORMAT = '%H:%M:%S %d/%m/%y'
 
 SERVER_START = '--- Starting server on port {port} at {date} ---'
 SERVER_ECHO = '[{date}] Echoed: {msg}'
-SERVER_END = '\n--- Stopping server on port {port} at {date} ---'
+SERVER_END = '--- Stopping server on port {port} at {date} ---'
+
+
+def run_echo_loop(conn):
+    msg = b''
+    while True:
+        try:
+            buffer = conn.recv(BUFFER_SIZE)
+        except OSError:
+            break
+        msg += buffer
+        if len(buffer) < BUFFER_SIZE:
+            break
+    conn.sendall(msg)
+    print(
+        SERVER_ECHO.format(
+            msg=msg.decode('utf8'),
+            date=datetime.now().strftime(DATE_FORMAT)))
+
+
+def run_echo(server):
+    server.listen()
+    conn, addr = server.accept()
+    with conn:
+        # while True:
+        run_echo_loop(conn)
 
 
 def main():
     try:
         with socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) as server:
+            server.settimeout(10)
             server.bind(ADDR)
             print(
                 SERVER_START.format(
                     port=ADDR[1],
                     date=datetime.now().strftime(DATE_FORMAT)))
-            server.listen()
-            conn, addr = server.accept()
-            with conn:
-                # while True:
-                    msg = b''
-                    while True:
-                        buffer = conn.recv(BUFFER_SIZE)
-                        msg += buffer
-                        if len(buffer) < BUFFER_SIZE:
-                            break
-                    conn.sendall(msg)
-                    print(
-                        SERVER_ECHO.format(
-                            msg=msg.decode('utf8'),
-                            date=datetime.now().strftime(DATE_FORMAT)))
+            run_echo(server)
     finally:
         print(
             SERVER_END.format(
