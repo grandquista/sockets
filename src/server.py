@@ -20,7 +20,7 @@ from socket import socket, AF_INET, IPPROTO_TCP, SOCK_STREAM
 
 ADDR = ('127.0.0.1', 8080)
 
-BUFFER_SIZE = 1024
+BUFFER_SIZE = 8
 
 DATE_FORMAT = '%H:%M:%S %d/%m/%y'
 

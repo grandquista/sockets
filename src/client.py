@@ -14,7 +14,7 @@ from sys import argv
 
 ADDR = ('127.0.0.1', 8080)
 
-BUFFER_SIZE = 1024
+BUFFER_SIZE = 8
 
 
 def main():
